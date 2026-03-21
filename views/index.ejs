@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azurro Hotel - Cleaner Log</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 500px;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .camera-section {
+      margin: 25px 0;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    #videoPreview {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 6px;
+      background: #000;
+      display: block;
+      margin: 15px 0;
+    }
+
+    .camera-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+
+    #photoPreview {
+      width: 100%;
+      border-radius: 6px;
+      margin-top: 15px;
+      display: none;
+      max-height: 300px;
+      object-fit: cover;
+    }
+
+    .submit-section {
+      margin-top: 30px;
+    }
+
+    .submit-section button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 16px;
+    }
+
+    .submit-section button:hover {
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .submit-section button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      display: none;
+      text-align: center;
+    }
+
+    .status-message.success {
+      background: #d4edda;
+      color: #155724;
+      display: block;
+    }
+
+    .status-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      display: block;
+    }
+
+    .status-message.loading {
+      background: #d1ecf1;
+      color: #0c5460;
+      display: block;
+    }
+
+    .camera-icon {
+      font-size: 24px;
+      margin-right: 8px;
+    }
+
+    #photoStatus {
+      margin-top: 10px;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 13px;
+    }
+
+    .gallery-link {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .gallery-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .gallery-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+        border-radius: 8px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      button {
+        font-size: 13px;
+        padding: 10px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏨 Azurro Hotel</h1>
+    <p class="subtitle">Cleaner Activity Log</p>
+
+    <form id="cleaningForm">
+      <div class="form-group">
+        <label for="cleanerName">Cleaner Name *</label>
+        <input 
+          type="text" 
+          id="cleanerName" 
+          name="cleanerName" 
+          required
+          placeholder="Enter your full name"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="property">Property *</label>
+        <select id="property" name="property" required>
+          <option value="">Select property</option>
+          <% properties.forEach(prop => { %>
+            <option value="<%= prop %>"><%= prop %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="roomNumber">Room Number *</label>
+        <input 
+          type="text" 
+          id="roomNumber" 
+          name="roomNumber" 
+          required
+          placeholder="e.g. 101, 205, Suite A"
+        >
+      </div>
+
+      <div class="camera-section">
+        <div>📸 Capture Photo</div>
+        <video id="videoPreview" width="100%" playsinline autoplay muted></video>
+        <img id="photoPreview" alt="Photo preview">
+        <div id="photoStatus"></div>
+        <div class="camera-buttons">
+          <button type="button" class="btn-primary" id="startBtn">
+            <span class="camera-icon">▶</span>Start Camera
+          </button>
+          <button type="button" class="btn-secondary" id="captureBtn" style="display: none;">
+            <span class="camera-icon">📷</span>Capture
+          </button>
+          <button type="button" class="btn-secondary" id="retakeBtn" style="display: none;">
+            <span class="camera-icon">🔄</span>Retake
+          </button>
+        </div>
+      </div>
+
+      <div class="submit-section">
+        <button type="submit" id="submitBtn">Submit Cleaning Log</button>
+        <div id="statusMessage" class="status-message"></div>
+      </div>
+
+      <div class="gallery-link">
+        <a href="/gallery">📋 View All Logs</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const retakeBtn = document.getElementById('retakeBtn');
+    const videoPreview = document.getElementById('videoPreview');
+    const photoPreview = document.getElementById('photoPreview');
+    const photoStatus = document.getElementById('photoStatus');
+    const form = document.getElementById('cleaningForm');
+    const statusMessage = document.getElementById('statusMessage');
+
+    let stream = null;
+    let canvas = null;
+    let photoData = null;
+
+    // Request rear camera on mobile
+    async function startCamera() {
+      try {
+        // Check if browser supports camera API
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          setStatus('error', '❌ Camera API not available. Try using Chrome/Firefox and ensure HTTPS or localhost access.');
+          console.error('getUserMedia not supported');
+          return;
+        }
+
+        // Try with preferred rear camera first
+        let constraints = {
+          video: {
+            facingMode: 'environment',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        };
+
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (e) {
+          // If that fails, try with just generic video
+          console.warn('Rear camera failed, trying generic camera:', e.message);
+          constraints = { video: { width: { ideal: 1280 }, height: { ideal: 720 } } };
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+        }
+
+        videoPreview.srcObject = stream;
+        videoPreview.style.display = 'block';
+        photoPreview.style.display = 'none';
+        
+        // Ensure video plays on Android
+        videoPreview.play().catch(err => {
+          console.warn('Video play error:', err);
+        });
+        
+        startBtn.style.display = 'none';
+        captureBtn.style.display = 'inline-block';
+        retakeBtn.style.display = 'none';
+        photoStatus.textContent = 'Camera ready - tap Capture to take a photo';
+      } catch (error) {
+        console.error('Camera error details:', error.name, error.message);
+        if (error.name === 'NotAllowedError') {
+          setStatus('error', '❌ Camera permission denied. Grant permission in Settings → Apps → [Browser] → Permissions → Camera');
+        } else if (error.name === 'NotFoundError') {
+          setStatus('error', '❌ No camera found on this device.');
+        } else if (error.name === 'SecurityError') {
+          setStatus('error', '❌ HTTPS required for camera access. Use localhost or deploy with HTTPS.');
+        } else {
+          setStatus('error', `❌ Camera error: ${error.message}`);
+        }
+      }
+    }
+
+    function capturePhoto() {
+      // Wait for video dimensions to load
+      if (videoPreview.videoWidth === 0 || videoPreview.videoHeight === 0) {
+        photoStatus.textContent = '⏳ Loading video... try again';
+        setTimeout(capturePhoto, 500);
+        return;
+      }
+
+      canvas = document.createElement('canvas');
+      canvas.width = videoPreview.videoWidth;
+      canvas.height = videoPreview.videoHeight;
+      const ctx = canvas.getContext('2d');
+      
+      // Draw the video frame to canvas
+      ctx.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
+
+      photoData = canvas.toDataURL('image/jpeg', 0.7);  // Reduced quality to reduce file size
+      
+      // Verify photo data was captured
+      if (!photoData || photoData === 'data:image/jpeg;base64,' || photoData.length < 1000) {
+        photoStatus.textContent = '❌ Photo capture failed - try again';
+        return;
+      }
+
+      photoPreview.src = photoData;
+      photoPreview.style.display = 'block';
+      videoPreview.style.display = 'none';
+
+      captureBtn.style.display = 'none';
+      retakeBtn.style.display = 'inline-block';
+      photoStatus.textContent = '✅ Photo captured';
+
+      stopCamera();
+    }
+
+    function retakePhoto() {
+      photoData = null;
+      photoPreview.style.display = 'none';
+      photoPreview.src = '';
+      videoPreview.style.display = 'block';
+      retakeBtn.style.display = 'none';
+      captureBtn.style.display = 'inline-block';
+      photoStatus.textContent = 'Camera ready - tap Capture to take a photo';
+      startCamera();
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+    }
+
+    startBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      startCamera();
+    });
+
+    captureBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      capturePhoto();
+    });
+
+    retakeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      retakePhoto();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const cleanerName = document.getElementById('cleanerName').value.trim();
+      const property = document.getElementById('property').value;
+      const roomNumber = document.getElementById('roomNumber').value.trim();
+
+      if (!cleanerName || !property || !roomNumber) {
+        setStatus('error', '❌ Please fill in all required fields');
+        return;
+      }
+
+      if (!photoData) {
+        setStatus('error', '❌ Please capture a photo');
+        return;
+      }
+
+      setStatus('loading', '⏳ Submitting...');
+
+      try {
+        const response = await fetch('/api/cleanings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cleanerName,
+            property,
+            roomNumber,
+            photoData
+          })
+        });
+
+        if (response.ok) {
+          setStatus('success', '✅ Cleaning log submitted successfully!');
+          form.reset();
+          photoData = null;
+          photoPreview.style.display = 'none';
+          photoPreview.src = '';
+          videoPreview.style.display = 'none';
+          startBtn.style.display = 'inline-block';
+          captureBtn.style.display = 'none';
+          retakeBtn.style.display = 'none';
+          photoStatus.textContent = '';
+          setTimeout(() => setStatus('', ''), 3000);
+        } else {
+          const error = await response.json();
+          setStatus('error', `❌ ${error.error || 'Submission failed'}`);
+        }
+      } catch (error) {
+        setStatus('error', `❌ Network error: ${error.message}`);
+      }
+    });
+
+    function setStatus(type, message) {
+      statusMessage.className = 'status-message';
+      if (type) {
+        statusMessage.classList.add(type);
+      }
+      statusMessage.textContent = message;
+    }
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', stopCamera);
+  </script>
+</body>
+</html>
