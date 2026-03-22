@@ -5,16 +5,52 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "node --watch app.js"
+    "dev": "node --watch app.js",
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "sqlite3": "^5.1.7",
+    "bcryptjs": "^3.0.3",
     "body-parser": "^1.20.2",
-    "ejs": "^3.1.9"
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "multer": "^2.1.1",
+    "sqlite3": "^5.1.7",
+    "winston": "^3.19.0"
   },
-  "devDependencies": {},
-  "keywords": ["hotel", "cleaner", "management"],
+  "keywords": [
+    "hotel",
+    "cleaner",
+    "management"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/tests/**/*.test.js"],
+    "testTimeout": 10000,
+    "maxWorkers": 1,
+    "collectCoverageFrom": [
+      "app.js",
+      "database/db.js",
+      "!**/node_modules/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 50,
+        "functions": 50,
+        "lines": 50,
+        "statements": 50
+      }
+    }
+  }
 }

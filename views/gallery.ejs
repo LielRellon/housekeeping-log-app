@@ -78,7 +78,7 @@
 
     .card-image {
       width: 100%;
-      height: 250px;
+      height: 400px;
       object-fit: cover;
       background: #f0f0f0;
     }
@@ -299,14 +299,14 @@
     .card-content {
       padding: 15px;
     }
+
+    .empty-state {
       background: white;
       border-radius: 12px;
       padding: 60px 20px;
       text-align: center;
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     }
-
-    .empty-state h2 {
       color: #667eea;
       margin-bottom: 10px;
     }
@@ -355,7 +355,23 @@
       <div class="gallery">
         <% cleanings.forEach(cleaning => { %>
           <div class="card" data-id="<%= cleaning.id %>">
-            <img src="<%= cleaning.photoData %>" alt="<%= cleaning.cleanerName %>" class="card-image">
+            <% 
+              let imgSrc = cleaning.photoData;
+              if (cleaning.photoData.startsWith('data:')) {
+                // Base64 data - use as is
+                imgSrc = cleaning.photoData;
+              } else if (cleaning.photoData.startsWith('/uploads/')) {
+                // Already has correct path
+                imgSrc = cleaning.photoData;
+              } else if (cleaning.photoData.startsWith('/')) {
+                // Has slash but missing /uploads - prepend it
+                imgSrc = '/uploads' + cleaning.photoData;
+              } else {
+                // No slash - prepend /uploads/
+                imgSrc = '/uploads/' + cleaning.photoData;
+              }
+            %>
+            <img src="<%= imgSrc %>" alt="<%= cleaning.cleanerName %>" class="card-image" onerror="console.error('Image failed to load:', '<%= imgSrc %>')" onload="console.log('Image loaded:', '<%= imgSrc %>')">
             <div class="card-content">
               <div class="card-title"><%= cleaning.cleanerName %></div>
               <div class="card-property">📍 <%= cleaning.property %></div>
@@ -364,8 +380,7 @@
                 <%= new Date(cleaning.timestamp).toLocaleString() %>
               </div>
               <div class="card-actions">
-                <button class="btn-edit" onclick="openEditModal(<%= cleaning.id %>, '<%= cleaning.cleanerName %>', '<%= cleaning.property %>', '<%= cleaning.roomNumber %>')">✏️ Edit</button>
-                <button class="btn-delete" onclick="deleteCleaning(<%= cleaning.id %>)">🗑️ Delete</button>
+                <button class="btn-edit" data-action="edit" data-id="<%= cleaning.id %>" data-name="<%= cleaning.cleanerName %>" data-property="<%= cleaning.property %>" data-room="<%= cleaning.roomNumber %>">✏️ Edit</button>
               </div>
             </div>
           </div>
@@ -376,6 +391,33 @@
         <h2>No cleaning logs yet</h2>
         <p>Start by creating your first cleaning log</p>
         <a href="/">Create First Log</a>
+      </div>
+    <% } %>
+    
+    <% if (cleanings && cleanings.length > 0 && totalPages > 1) { %>
+      <div style="text-align: center; margin: 30px 0; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+        <div style="margin-bottom: 15px;">
+          Showing page <%= currentPage %> of <%= totalPages %> (Total: <%= total %> records)
+        </div>
+        <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+          <% if (currentPage > 1) { %>
+            <a href="/gallery?page=1" class="btn">First</a>
+            <a href="/gallery?page=<%= currentPage - 1 %>" class="btn">Previous</a>
+          <% } %>
+          
+          <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+            <% if (i === currentPage) { %>
+              <span style="padding: 8px 12px; background: #4CAF50; color: white; border-radius: 4px; font-weight: bold;"><%= i %></span>
+            <% } else { %>
+              <a href="/gallery?page=<%= i %>" class="btn"><%= i %></a>
+            <% } %>
+          <% } %>
+          
+          <% if (currentPage < totalPages) { %>
+            <a href="/gallery?page=<%= currentPage + 1 %>" class="btn">Next</a>
+            <a href="/gallery?page=<%= totalPages %>" class="btn">Last</a>
+          <% } %>
+        </div>
       </div>
     <% } %>
   </div>
@@ -511,6 +553,23 @@
         closeEditModal();
       }
     };
+
+    // Event delegation for edit and delete buttons
+    document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-edit')) {
+          const id = parseInt(e.target.dataset.id);
+          const name = e.target.dataset.name;
+          const property = e.target.dataset.property;
+          const room = e.target.dataset.room;
+          openEditModal(id, name, property, room);
+        }
+        if (e.target.classList.contains('btn-delete')) {
+          const id = parseInt(e.target.dataset.id);
+          deleteCleaning(id);
+        }
+      });
+    });
   </script>
 </body>
 </html>

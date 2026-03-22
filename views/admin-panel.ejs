@@ -206,6 +206,24 @@
       transform: translateY(-2px);
     }
 
+    .delete-btn {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.3s;
+      margin-left: 8px;
+    }
+
+    .delete-btn:hover {
+      background: #ff3838;
+      transform: translateY(-2px);
+    }
+
     .empty-state {
       padding: 40px;
       text-align: center;
@@ -323,7 +341,23 @@
           <% cleanings.forEach(cleaning => { %>
             <div class="table-row" id="row-<%= cleaning.id %>">
               <div>
-                <img src="<%= cleaning.photoData %>" alt="photo" class="photo-thumb" onclick="openPreview('<%= cleaning.photoData %>','<%= cleaning.cleanerName %>')">
+                <% 
+                  let imgSrc = cleaning.photoData;
+                  if (cleaning.photoData.startsWith('data:')) {
+                    // Base64 data - use as is
+                    imgSrc = cleaning.photoData;
+                  } else if (cleaning.photoData.startsWith('/uploads/')) {
+                    // Already has correct path
+                    imgSrc = cleaning.photoData;
+                  } else if (cleaning.photoData.startsWith('/')) {
+                    // Has slash but missing /uploads - prepend it
+                    imgSrc = '/uploads' + cleaning.photoData;
+                  } else {
+                    // No slash - prepend /uploads/
+                    imgSrc = '/uploads/' + cleaning.photoData;
+                  }
+                %>
+                <img src="<%= imgSrc %>" alt="photo" class="photo-thumb" data-action="preview" style="cursor: pointer;">
               </div>
               <div>
                 <strong><%= cleaning.cleanerName %></strong><br>
@@ -337,13 +371,41 @@
                 </span>
               </div>
               <div>
-                <button class="toggle-btn" onclick="toggleVisibility(<%= cleaning.id %>, '<%= token %>')">
+                <button class="toggle-btn" data-action="toggle" data-id="<%= cleaning.id %>">
                   <%= cleaning.visibility === 1 ? 'Hide' : 'Show' %>
                 </button>
+                <button class="delete-btn" data-action="delete" data-id="<%= cleaning.id %>">🗑️ Delete</button>
               </div>
             </div>
           <% }); %>
         </div>
+        
+        <% if (totalPages && totalPages > 1) { %>
+          <div style="text-align: center; margin: 30px 0; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+            <div style="margin-bottom: 15px;">
+              Showing page <%= currentPage %> of <%= totalPages %> (Total: <%= total %> records)
+            </div>
+            <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+              <% if (currentPage > 1) { %>
+                <a href="/admin-panel?page=1" class="btn">First</a>
+                <a href="/admin-panel?page=<%= currentPage - 1 %>" class="btn">Previous</a>
+              <% } %>
+              
+              <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                <% if (i === currentPage) { %>
+                  <span style="padding: 8px 12px; background: #4CAF50; color: white; border-radius: 4px; font-weight: bold;"><%= i %></span>
+                <% } else { %>
+                  <a href="/admin-panel?page=<%= i %>" class="btn"><%= i %></a>
+                <% } %>
+              <% } %>
+              
+              <% if (currentPage < totalPages) { %>
+                <a href="/admin-panel?page=<%= currentPage + 1 %>" class="btn">Next</a>
+                <a href="/admin-panel?page=<%= totalPages %>" class="btn">Last</a>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
       <% } else { %>
         <div class="empty-state">
           <h2>No cleaning logs found</h2>
@@ -386,12 +448,13 @@
         const response = await fetch('/admin-login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password })
+          body: JSON.stringify({ password }),
+          credentials: 'include'
         });
 
         if (response.ok) {
-          const data = await response.json();
-          window.location.href = `/admin-panel?token=${data.token}`;
+          // Token is set as secure cookie automatically
+          location.reload();
         } else {
           alert('❌ Invalid password');
           document.getElementById('password').value = '';
@@ -401,9 +464,44 @@
       }
     }
 
-    async function toggleVisibility(id, token) {
+    async function deleteCleaning(id) {
+      if (!confirm('Are you sure you want to delete this cleaning log? This cannot be undone.')) {
+        return;
+      }
+
       try {
-        const response = await fetch(`/api/admin/toggle-visibility/${id}?token=${token}`, {
+        const response = await fetch(`/api/cleaning/${id}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          // Remove row from table with animation
+          const row = document.getElementById(`row-${id}`);
+          if (row) {
+            row.style.transition = 'opacity 0.3s';
+            row.style.opacity = '0';
+            setTimeout(() => {
+              row.remove();
+              // Reload page if no more rows
+              const tableBody = document.querySelector('.table-rows');
+              if (tableBody && tableBody.children.length === 0) {
+                location.reload();
+              }
+            }, 300);
+          }
+        } else {
+          const error = await response.json();
+          alert(`Failed to delete: ${error.error}`);
+        }
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    }
+
+    async function toggleVisibility(id) {
+      try {
+        const response = await fetch(`/api/admin/toggle-visibility/${id}`, {
           method: 'POST'
         });
 
@@ -414,11 +512,11 @@
           const btnEl = row.querySelector('.toggle-btn');
 
           if (data.visibility === 1) {
-            statusEl.textContent = '👁️ Visible';
+            statusEl.innerHTML = '👁️ Visible';
             statusEl.className = 'visibility-status visible';
             btnEl.textContent = 'Hide';
           } else {
-            statusEl.textContent = '🚫 Hidden';
+            statusEl.innerHTML = '🚫 Hidden';
             statusEl.className = 'visibility-status hidden';
             btnEl.textContent = 'Show';
           }
@@ -430,8 +528,9 @@
       }
     }
 
-    function logout() {
-      window.location.href = '/admin-panel';
+    async function logout() {
+      await fetch('/logout', { method: 'POST' });
+      location.href = '/admin-panel';
     }
 
     function openPreview(imageData, cleanerName) {
@@ -451,6 +550,24 @@
     // Close modal on Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closePreview();
+    });
+
+    // Event delegation for preview and toggle buttons
+    document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('click', (e) => {
+        if (e.target.dataset.action === 'preview') {
+          const img = e.target;
+          openPreview(img.src, '');
+        }
+        if (e.target.dataset.action === 'toggle') {
+          const id = parseInt(e.target.dataset.id);
+          toggleVisibility(id);
+        }
+        if (e.target.dataset.action === 'delete') {
+          const id = parseInt(e.target.dataset.id);
+          deleteCleaning(id);
+        }
+      });
     });
   </script>
 </body>
