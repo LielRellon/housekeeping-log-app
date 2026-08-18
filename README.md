@@ -1,16 +1,18 @@
-# Azurro Hotel - Cleaner Management App
+# Housekeeping Log App
 
 A phone-friendly web application for logging hotel cleaner activities with photo capture using the device's rear camera.
+
+Built as a technical assessment — a working, production-hardened implementation rather than a demo: secure admin auth, XSS/injection and brute-force hardening, an atomic visibility toggle that removes a read-modify-write race, DB indexing, pagination, and a Jest/Supertest suite. Property names and seed data are generic placeholders.
 
 ## Features
 
 - ✅ **Cleaner Name Input** - Simple text field for cleaner identification
 - ✅ **Property Selection** - Choose from 5 hotel properties:
-  - Surry Hills
-  - Central Sydney
-  - Potts Point
-  - Darling Harbour
-  - Pyrmont Budget Hotel
+  - Riverside
+  - City Central
+  - Harbourview
+  - Marina Quay
+  - Parkside Budget Hotel
 - ✅ **Rear Camera Photo Capture** - Uses device rear camera for photos (no file uploads)
 - ✅ **Mobile Responsive** - Fully optimized for phone browsers
 - ✅ **Photo Gallery** - View all submitted cleaning logs with photos

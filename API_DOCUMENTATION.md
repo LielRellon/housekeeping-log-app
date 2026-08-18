@@ -1,4 +1,4 @@
-# Azurro Hotel Cleaner Management API Documentation
+# Housekeeping Log Cleaner Management API Documentation
 
 ## Overview
 RESTful API for managing hotel cleaning logs with photo capture, role-based access control, and admin visibility management.
@@ -94,7 +94,7 @@ Get all public cleaning logs (JSON format)
     {
       "id": 1,
       "cleanerName": "John",
-      "property": "Surry Hills",
+      "property": "Riverside",
       "roomNumber": "101",
       "photoData": "/uploads/photo_1234567890.jpg",
       "timestamp": "2026-03-22T10:30:00.000Z",
@@ -117,7 +117,7 @@ Submit a new cleaning log
 ```json
 {
   "cleanerName": "John",
-  "property": "Surry Hills",
+  "property": "Riverside",
   "roomNumber": "101",
   "photoData": "data:image/jpeg;base64,..."
 }
@@ -125,7 +125,7 @@ Submit a new cleaning log
 
 **Validation:**
 - `cleanerName`: Required, 1-100 characters
-- `property`: Required, must be one of: Surry Hills, Central Sydney, Potts Point, Darling Harbour, Pyrmont Budget Hotel
+- `property`: Required, must be one of: Riverside, City Central, Harbourview, Marina Quay, Parkside Budget Hotel
 - `roomNumber`: Required, 1-20 characters
 - `photoData`: Required, base64 encoded JPEG image
 
@@ -145,7 +145,7 @@ Get a specific cleaning log
 {
   "id": 1,
   "cleanerName": "John",
-  "property": "Surry Hills",
+  "property": "Riverside",
   "roomNumber": "101",
   "photoData": "/uploads/photo_1234567890.jpg",
   "timestamp": "2026-03-22T10:30:00.000Z",
@@ -194,7 +194,7 @@ Update a cleaning log (admin only)
 ```json
 {
   "cleanerName": "John Updated",
-  "property": "Central Sydney",
+  "property": "City Central",
   "roomNumber": "102"
 }
 ```
@@ -247,11 +247,11 @@ Logout and invalidate session
 
 ## Properties
 Valid property values:
-- Surry Hills
-- Central Sydney
-- Potts Point
-- Darling Harbour
-- Pyrmont Budget Hotel
+- Riverside
+- City Central
+- Harbourview
+- Marina Quay
+- Parkside Budget Hotel
 
 ---
 
@@ -263,7 +263,7 @@ curl -X POST http://localhost:3000/api/cleanings \
   -H "Content-Type: application/json" \
   -d '{
     "cleanerName": "John",
-    "property": "Surry Hills",
+    "property": "Riverside",
     "roomNumber": "101",
     "photoData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABA..."
   }'
@@ -289,7 +289,7 @@ curl -X PUT http://localhost:3000/api/cleaning/1 \
   -b cookies.txt \
   -d '{
     "cleanerName": "Jane",
-    "property": "Central Sydney",
+    "property": "City Central",
     "roomNumber": "102"
   }'
 ```

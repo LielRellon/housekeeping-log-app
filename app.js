@@ -142,7 +142,7 @@ app.use((req, res, next) => {
 });
 
 // Properties validation
-const VALID_PROPERTIES = ['Surry Hills', 'Central Sydney', 'Potts Point', 'Darling Harbour', 'Pyrmont Budget Hotel'];
+const VALID_PROPERTIES = ['Riverside', 'City Central', 'Harbourview', 'Marina Quay', 'Parkside Budget Hotel'];
 function isValidProperty(prop) {
   return VALID_PROPERTIES.includes(prop);
 }

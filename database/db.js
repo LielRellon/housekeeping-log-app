@@ -5,11 +5,11 @@ const dbPath = path.join(__dirname, 'cleanings.db');
 let db;
 
 const properties = [
-  'Surry Hills',
-  'Central Sydney',
-  'Potts Point',
-  'Darling Harbour',
-  'Pyrmont Budget Hotel'
+  'Riverside',
+  'City Central',
+  'Harbourview',
+  'Marina Quay',
+  'Parkside Budget Hotel'
 ];
 
 function init() {

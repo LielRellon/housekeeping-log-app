@@ -27,9 +27,9 @@ describe('Database Functions', () => {
       expect(properties.length).toBeGreaterThan(0);
     });
 
-    it('should include Surry Hills', () => {
+    it('should include Riverside', () => {
       const properties = db.getProperties();
-      expect(properties).toContain('Surry Hills');
+      expect(properties).toContain('Riverside');
     });
   });
 
@@ -38,7 +38,7 @@ describe('Database Functions', () => {
     it('should insert a cleaning record', async () => {
       const result = await db.insertCleaning(
         'Test Cleaner',
-        'Surry Hills',
+        'Riverside',
         '101',
         '/test/photo.jpg'
       );
@@ -54,7 +54,7 @@ describe('Database Functions', () => {
     beforeAll(async () => {
       testId = await db.insertCleaning(
         'John Doe',
-        'Central Sydney',
+        'City Central',
         '202',
         '/test/photo.jpg'
       );
@@ -80,14 +80,14 @@ describe('Database Functions', () => {
     beforeAll(async () => {
       testId = await db.insertCleaning(
         'Original Name',
-        'Potts Point',
+        'Harbourview',
         '303',
         '/test/photo.jpg'
       );
     });
 
     it('should update a cleaning record', async () => {
-      await db.updateCleaning(testId, 'Updated Name', 'Potts Point', '304');
+      await db.updateCleaning(testId, 'Updated Name', 'Harbourview', '304');
       const cleaning = await db.getCleaning(testId);
       expect(cleaning.cleanerName).toBe('Updated Name');
       expect(cleaning.roomNumber).toBe('304');
@@ -101,7 +101,7 @@ describe('Database Functions', () => {
     beforeAll(async () => {
       testId = await db.insertCleaning(
         'To Delete',
-        'Darling Harbour',
+        'Marina Quay',
         '405',
         '/test/photo.jpg'
       );
@@ -121,7 +121,7 @@ describe('Database Functions', () => {
     beforeAll(async () => {
       testId = await db.insertCleaning(
         'Visibility Test',
-        'Pyrmont Budget Hotel',
+        'Parkside Budget Hotel',
         '505',
         '/test/photo.jpg'
       );

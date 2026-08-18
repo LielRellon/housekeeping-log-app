@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../app');
 const db = require('../database/db');
 
-describe('Azurro Hotel API', () => {
+describe('Housekeeping Log API', () => {
   let server;
 
   beforeAll((done) => {
@@ -43,7 +43,7 @@ describe('Azurro Hotel API', () => {
         .get('/')
         .expect(200);
 
-      expect(response.text).toContain('Azurro Hotel');
+      expect(response.text).toContain('Housekeeping Log');
     });
   });
 
@@ -100,7 +100,7 @@ describe('Azurro Hotel API', () => {
         .post('/api/cleanings')
         .send({
           cleanerName: longName,
-          property: 'Surry Hills',
+          property: 'Riverside',
           roomNumber: '101',
           photoData: 'data:image/jpeg;base64,test'
         })
@@ -115,7 +115,7 @@ describe('Azurro Hotel API', () => {
         .post('/api/cleanings')
         .send({
           cleanerName: 'John',
-          property: 'Surry Hills',
+          property: 'Riverside',
           roomNumber: longRoomNumber,
           photoData: 'data:image/jpeg;base64,test'
         })

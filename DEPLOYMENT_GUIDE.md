@@ -1,4 +1,4 @@
-# Azurro Hotel Deployment Guide
+# Housekeeping Log Deployment Guide
 
 ## Prerequisites
 - Node.js 16+ installed

@@ -5,3 +5,7 @@ node_modules/
 .env
 dist/
 build/
+
+# runtime photo uploads — artifacts, not source
+public/uploads/*
+!public/uploads/.gitkeep
