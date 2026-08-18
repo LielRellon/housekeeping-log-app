@@ -70,7 +70,7 @@ On a smartphone:
 ## Project Structure
 
 ```
-azurro-hotel/
+housekeeping-log/
 ├── app.js                 # Main Express application
 ├── package.json           # Dependencies configuration
 ├── public/               # Static files (CSS, images)
@@ -100,7 +100,7 @@ azurro-hotel/
 6. For production use PM2:
    ```bash
    npm install -g pm2
-   pm2 start app.js --name "azurro-hotel"
+   pm2 start app.js --name "housekeeping-log"
    pm2 startup
    pm2 save
    ```

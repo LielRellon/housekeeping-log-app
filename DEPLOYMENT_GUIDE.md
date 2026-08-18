@@ -13,7 +13,7 @@
 ### 1. Clone and Install
 ```bash
 git clone <repository-url>
-cd azurroHotel
+cd housekeeping-log-app
 npm install
 ```
 
@@ -54,7 +54,7 @@ ssh user@your-vps-ip
 ```bash
 cd /var/www
 git clone <repository-url>
-cd azurroHotel
+cd housekeeping-log-app
 npm install --production
 ```
 
@@ -69,7 +69,7 @@ Update with production values:
 PORT=3000
 NODE_ENV=production
 ADMIN_PASSWORD=very-secure-random-password
-DATABASE_PATH=/var/data/azurroHotel/cleanings.db
+DATABASE_PATH=/var/data/housekeeping-log-app/cleanings.db
 SESSION_TTL_MINUTES=30
 LOG_LEVEL=warn
 CORS_ORIGIN=https://your-domain.com
@@ -77,12 +77,12 @@ CORS_ORIGIN=https://your-domain.com
 
 ### 4. Create Data Directory
 ```bash
-mkdir -p /var/data/azurroHotel
-mkdir -p /var/www/azurroHotel/public/uploads
-mkdir -p /var/www/azurroHotel/logs
-chmod 755 /var/data/azurroHotel
-chmod 755 /var/www/azurroHotel/public/uploads
-chmod 755 /var/www/azurroHotel/logs
+mkdir -p /var/data/housekeeping-log-app
+mkdir -p /var/www/housekeeping-log-app/public/uploads
+mkdir -p /var/www/housekeeping-log-app/logs
+chmod 755 /var/data/housekeeping-log-app
+chmod 755 /var/www/housekeeping-log-app/public/uploads
+chmod 755 /var/www/housekeeping-log-app/logs
 ```
 
 ### 5. Setup Process Manager (PM2)
@@ -90,11 +90,11 @@ chmod 755 /var/www/azurroHotel/logs
 sudo npm install -g pm2
 
 # Start the application
-pm2 start app.js --name "azurro-hotel" \
+pm2 start app.js --name "housekeeping-log" \
   --env NODE_ENV=production \
   --max-memory-restart 500M \
-  --error /var/log/azurro-hotel-error.log \
-  --out /var/log/azurro-hotel-access.log
+  --error /var/log/housekeeping-log-error.log \
+  --out /var/log/housekeeping-log-access.log
 
 # Make it start on boot
 pm2 startup
@@ -104,12 +104,12 @@ pm2 save
 ### 6. Setup Nginx Reverse Proxy
 ```bash
 sudo apt-get install nginx
-sudo nano /etc/nginx/sites-available/azurro-hotel
+sudo nano /etc/nginx/sites-available/housekeeping-log
 ```
 
 Add configuration:
 ```nginx
-upstream azurro_hotel {
+upstream housekeeping_log {
     server localhost:3000;
 }
 
@@ -139,7 +139,7 @@ server {
     gzip_types text/plain text/css text/javascript application/json;
 
     location / {
-        proxy_pass http://azurro_hotel;
+        proxy_pass http://housekeeping_log;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -154,7 +154,7 @@ server {
 
 Enable site:
 ```bash
-sudo ln -s /etc/nginx/sites-available/azurro-hotel /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/housekeeping-log /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
@@ -170,15 +170,15 @@ Setup automated backups:
 ```bash
 # Create backup script
 echo '#!/bin/bash
-cp /var/data/azurroHotel/cleanings.db /var/backups/cleanings-$(date +%Y%m%d-%H%M%S).db
+cp /var/data/housekeeping-log-app/cleanings.db /var/backups/cleanings-$(date +%Y%m%d-%H%M%S).db
 # Keep only last 30 days
-find /var/backups/cleanings-*.db -mtime +30 -delete' > /usr/local/bin/backup-azurro.sh
+find /var/backups/cleanings-*.db -mtime +30 -delete' > /usr/local/bin/backup-housekeeping.sh
 
-chmod +x /usr/local/bin/backup-azurro.sh
+chmod +x /usr/local/bin/backup-housekeeping.sh
 
 # Add to crontab (daily at 2 AM)
 sudo crontab -e
-# Add: 0 2 * * * /usr/local/bin/backup-azurro.sh
+# Add: 0 2 * * * /usr/local/bin/backup-housekeeping.sh
 ```
 
 ---
@@ -188,7 +188,7 @@ sudo crontab -e
 ### Check Application Status
 ```bash
 pm2 status
-pm2 logs azurro-hotel
+pm2 logs housekeeping-log
 ```
 
 ### Monitor Endpoint
@@ -198,8 +198,8 @@ curl https://your-domain.com/health
 
 ### View Logs
 ```bash
-tail -f /var/log/azurro-hotel-access.log
-tail -f /var/log/azurro-hotel-error.log
+tail -f /var/log/housekeeping-log-access.log
+tail -f /var/log/housekeeping-log-error.log
 ```
 
 ---
@@ -208,17 +208,17 @@ tail -f /var/log/azurro-hotel-error.log
 
 ### Pull Latest Changes
 ```bash
-cd /var/www/azurroHotel
+cd /var/www/housekeeping-log-app
 git pull origin main
 npm install --production
-pm2 restart azurro-hotel
+pm2 restart housekeeping-log
 ```
 
 ### Rollback (if needed)
 ```bash
 git revert HEAD
 npm install --production
-pm2 restart azurro-hotel
+pm2 restart housekeeping-log
 ```
 
 ---
@@ -230,12 +230,12 @@ Already configured in Nginx above
 
 ### Configure Log Rotation
 ```bash
-sudo nano /etc/logrotate.d/azurro-hotel
+sudo nano /etc/logrotate.d/housekeeping-log
 ```
 
 Add:
 ```
-/var/log/azurro-hotel-*.log {
+/var/log/housekeeping-log-*.log {
     daily
     rotate 14
     compress
@@ -264,7 +264,7 @@ ps aux | grep node
 ### Application won't start
 ```bash
 # Check logs
-pm2 logs azurro-hotel --err
+pm2 logs housekeeping-log --err
 
 # Check port is not in use
 lsof -i :3000
@@ -276,7 +276,7 @@ cat .env | grep -v "^#"
 ### Database locked error
 ```bash
 # Restart application
-pm2 restart azurro-hotel
+pm2 restart housekeeping-log
 
 # If persists, check database permissions
 ls -la database/
@@ -285,7 +285,7 @@ ls -la database/
 ### High memory usage
 ```bash
 # Increase memory limit in pm2
-pm2 restart azurro-hotel --max-memory-restart 1000M
+pm2 restart housekeeping-log --max-memory-restart 1000M
 ```
 
 ### Rate limiting issues

@@ -25,7 +25,7 @@ const config = validateEnvironment();
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: winston.format.json(),
-  defaultMeta: { service: 'azurro-hotel' },
+  defaultMeta: { service: 'housekeeping-log' },
   transports: [
     new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/combined.log' }),

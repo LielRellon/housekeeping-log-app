@@ -1,5 +1,5 @@
 {
-  "name": "azurro-hotel-cleaner-app",
+  "name": "housekeeping-log-app",
   "version": "1.0.0",
   "description": "Hotel cleaner management app with photo capture",
   "main": "app.js",
